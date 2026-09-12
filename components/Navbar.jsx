@@ -1,0 +1,9 @@
+"use client";
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { getFavouriteIds, getUsername } from "../lib/storage";
+import { logoutUser } from "../lib/auth";
+import { api, clearSession } from "../lib/api";
+const links = [["⌂", "Dashboard", "/dashboard"], ["◈", "Ideas library", "/ideas"], ["♡", "Favourites", "/favourites"], ["○", "Profile", "/profile"], ["＋", "Submit Idea", "/submit-idea"], ["✦", "IDEALAUNCH AI", "/ai-helper"]];
+export default function Navbar() { const pathname = usePathname(); const router = useRouter(); const [username, setUsername] = useState("Explorer"); const [saved, setSaved] = useState(0); useEffect(() => { setUsername(getUsername()); api.get("/users/favourites").then((result) => setSaved(result.ideas.length)).catch(() => setSaved(getFavouriteIds().length)); const onStorage = () => setSaved(getFavouriteIds().length); window.addEventListener("storage", onStorage); return () => window.removeEventListener("storage", onStorage); }, [pathname]); return <aside className="sidebar"><div className="brand"><span className="brand-mark">I</span><span className="brand-name">IDEA<span>LAUNCH</span></span></div><p className="sidebar-label">Workspace</p><nav className="nav-list">{links.map(([icon, label, href]) => <Link key={href} className={`nav-link ${pathname === href ? "active" : ""}`} href={href}><span className="nav-icon">{icon}</span>{label}{label === "Favourites" && <span className="nav-count">{saved}</span>}</Link>)}</nav><div className="sidebar-bottom"><div className="mini-profile"><span className="avatar">{username.charAt(0).toUpperCase()}</span><div><strong>{username}</strong><span>Idea explorer</span></div></div><button className="logout-button" type="button" onClick={async () => { try { await api.post("/auth/logout", {}); } catch { } clearSession(); logoutUser(); router.push("/"); }}>↪ &nbsp; Log out</button></div></aside>; }

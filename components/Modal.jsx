@@ -1,0 +1,2 @@
+"use client";
+export default function Modal({ open, title, children, onClose }) { if (!open) return null; return <div role="dialog" aria-modal="true" className="fixed inset-0 z-50 grid place-items-center bg-black/60 p-5" onClick={onClose}><section className="panel max-w-lg" onClick={(event) => event.stopPropagation()}><div className="section-heading"><h2>{title}</h2><button className="icon-button" onClick={onClose} aria-label="Close">×</button></div>{children}</section></div>; }
